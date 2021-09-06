@@ -25,14 +25,14 @@ namespace DSTModManagerAPI.Controllers
         }
 
         [HttpGet]
-        public IEnumerable<WeatherForecast> Get()
+        public IEnumerable<object> Get()
         {
-            Lua state = new Lua();
-            var jsonFilePath = System.IO.Path.Combine("LuaScripts", "json.lua");
-            state.DoFile(jsonFilePath);
-            var modMgrFilePath = System.IO.Path.Combine("LuaScripts", "getmods.lua");
-            if (System.IO.File.Exists(modMgrFilePath))
-                state.DoFile(modMgrFilePath);
+            using (Lua lua = new Lua())
+            {
+                var modMgrFilePath = System.IO.Path.Combine("LuaScripts", "getmods.lua");
+                //if (System.IO.File.Exists(modMgrFilePath))
+                return lua.DoFile(modMgrFilePath);
+            }
             var rng = new Random();
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
             {

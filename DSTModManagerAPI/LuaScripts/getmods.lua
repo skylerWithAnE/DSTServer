@@ -1,4 +1,4 @@
-﻿json = require "json"
+﻿json = require "LuaScripts/json"
 
 modOverridesFilePath = "/home/dst/.klei/DoNotStarveTogether/TheHive/Master/modoverrides.lua"
 ugcModsFilePath = "/home/dst/server_dst/ugc_mods/TheHive/Master/content/322330/%s/modinfo.lua"
@@ -39,7 +39,12 @@ function modUrl(id)
     return string.format(steamWorkshopUrl, v)
 end
 
-val = dofile(modOverridesFilePath)
+val, err = loadfile(modOverridesFilePath)
+if (err == nil) then
+    val = dofile(modOverridesFilePath)
+else
+    return json.encode({error = "An error occurred"})
+end
 i = 0
 jArr = {}
 for k, v in pairs(val) do
@@ -53,3 +58,5 @@ for k, v in pairs(val) do
     end
     i = i + 1
 end
+
+return jArr
