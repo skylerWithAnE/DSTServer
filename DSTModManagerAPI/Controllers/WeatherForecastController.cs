@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using NLua;
 
 namespace DSTModManagerAPI.Controllers
 {
@@ -26,6 +27,12 @@ namespace DSTModManagerAPI.Controllers
         [HttpGet]
         public IEnumerable<WeatherForecast> Get()
         {
+            Lua state = new Lua();
+            var jsonFilePath = System.IO.Path.Combine("LuaScripts", "json.lua");
+            state.DoFile(jsonFilePath);
+            var modMgrFilePath = System.IO.Path.Combine("LuaScripts", "getmods.lua");
+            if (System.IO.File.Exists(modMgrFilePath))
+                state.DoFile(modMgrFilePath);
             var rng = new Random();
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
             {
