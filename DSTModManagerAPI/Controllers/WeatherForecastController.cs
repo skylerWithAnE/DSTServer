@@ -27,20 +27,27 @@ namespace DSTModManagerAPI.Controllers
         [HttpGet]
         public IEnumerable<object> Get()
         {
+            List<string> ModList = new List<string>();
             using (Lua lua = new Lua())
             {
+                lua.DoFile(System.IO.Path.Combine("LuaScripts", "config.lua"));
                 var modMgrFilePath = System.IO.Path.Combine("LuaScripts", "getmods.lua");
                 //if (System.IO.File.Exists(modMgrFilePath))
-                return lua.DoFile(modMgrFilePath);
+                object[] result = lua.DoFile(modMgrFilePath);
+                if (result.Length > 0 && result[0] is LuaTable)
+                {
+                    LuaTable table = result[0] as LuaTable;
+                    foreach (object kvp in table)
+                    {
+                        KeyValuePair<object, object>? kvpObj = kvp as KeyValuePair<object, object>?;
+                        if (kvpObj.HasValue)
+                        {
+                            ModList.Add(kvpObj.Value.ToString());
+                        }
+                    }
+                }
             }
-            var rng = new Random();
-            return Enumerable.Range(1, 5).Select(index => new WeatherForecast
-            {
-                Date = DateTime.Now.AddDays(index),
-                TemperatureC = rng.Next(-20, 55),
-                Summary = Summaries[rng.Next(Summaries.Length)]
-            })
-            .ToArray();
+            return ModList;
         }
     }
 }
